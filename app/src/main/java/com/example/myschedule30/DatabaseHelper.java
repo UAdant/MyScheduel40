@@ -21,7 +21,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_IS_DONE = "is_done"; // Нове поле для позначення виконання завдання
 
-    // SQL-запит для створення таблиці
+    // Імена таблиці та стовпців для іспитів
+    public static final String EXAM_TABLE_NAME = "exams";
+    public static final String EXAM_ID_COLUMN = "_id";
+    public static final String EXAM_NAME_COLUMN = "name";
+    public static final String EXAM_GRADE_COLUMN = "grade";
+
+    // SQL-запит для створення таблиць
     private static final String TABLE_CREATE =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -30,6 +36,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_DATE + " TEXT, " +
                     COLUMN_IS_DONE + " INTEGER DEFAULT 0)"; // Значення за замовчуванням - невиконане завдання
 
+    private static final String EXAM_TABLE_CREATE =
+            "CREATE TABLE " + EXAM_TABLE_NAME + " (" +
+                    EXAM_ID_COLUMN + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    EXAM_NAME_COLUMN + " TEXT, " +
+                    EXAM_GRADE_COLUMN + " REAL)";
+
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -37,7 +50,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(TABLE_CREATE);
+        db.execSQL(EXAM_TABLE_CREATE);
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -130,4 +145,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return completedTasks;
     }
 
+    // Додавання нового екзамену до бази даних
+    public long addExam(String name, double grade) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(EXAM_NAME_COLUMN, name);
+        values.put(EXAM_GRADE_COLUMN, grade);
+        return db.insert(EXAM_TABLE_NAME, null, values);
+    }
 }
